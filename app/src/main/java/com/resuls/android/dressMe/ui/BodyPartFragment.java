@@ -11,8 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.resuls.android.dressMe.R;
-import com.resuls.android.dressMe.data.AndroidImageAssets;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,6 +25,9 @@ public class BodyPartFragment extends Fragment
 
     private static final String TAG = "BodyPartFragment";
 
+    private static final String IMAGE_ID_LIST = "image_ids";
+    private static final String LIST_INDEX = "list_index";
+
     public BodyPartFragment()
     {
         listIndex = 0;
@@ -35,19 +38,39 @@ public class BodyPartFragment extends Fragment
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
+        if (savedInstanceState != null)
+        {
+            imageIds = savedInstanceState.getIntegerArrayList(IMAGE_ID_LIST);
+            listIndex = savedInstanceState.getInt(LIST_INDEX);
+        }
+
         View rootView = inflater.inflate(R.layout.fragment_body_part, container, false);
 
-        ImageView imageView = rootView.findViewById(R.id.bodyPart);
+        final ImageView imageView = rootView.findViewById(R.id.bodyPart);
 
         if (imageIds != null)
         {
             imageView.setImageResource(imageIds.get(listIndex));
+
+            imageView.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    if (listIndex < imageIds.size() - 1)
+                    {
+                        listIndex++;
+                    }
+                    else listIndex = 0;
+
+                    imageView.setImageResource(imageIds.get(listIndex));
+                }
+            });
         }
         else
         {
             Log.d(TAG, "null list of image IDs");
         }
-
 
         // Inflate the layout for this fragment
         return rootView;
@@ -61,5 +84,12 @@ public class BodyPartFragment extends Fragment
     public void setImageIds(List<Integer> imageIds)
     {
         this.imageIds = imageIds;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState)
+    {
+        outState.putIntegerArrayList(IMAGE_ID_LIST, (ArrayList<Integer>) imageIds);
+        outState.putInt(LIST_INDEX, listIndex);
     }
 }
